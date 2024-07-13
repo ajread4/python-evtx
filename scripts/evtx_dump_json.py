@@ -7,7 +7,6 @@
 #
 #   Requires:
 #     - xmltodict >= 0.12.0
-
 import os
 import json
 
@@ -19,8 +18,8 @@ import Evtx.Evtx as evtx
 def main():
     import argparse
     parser = argparse.ArgumentParser(description="Dump a binary EVTX file into XML.")
-    parser.add_argument("evtx", type=str,action='store', help="Path to the Windows EVTX event log file")
-    parser.add_argument("-o","--output",type=str, action='store', help="Path of output JSON file")
+    parser.add_argument("evtx",type=str,action="store",help="Path to the Windows EVTX event log file")
+    parser.add_argument("-o","--output",type=str, action="store",help="Path of output JSON file")
     args = parser.parse_args()
 
     with evtx.Evtx(args.evtx) as log:
