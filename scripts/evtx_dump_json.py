@@ -11,12 +11,13 @@ import os
 import json
 
 import xmltodict
+import argparse
 
 import Evtx.Evtx as evtx
 
 
 def main():
-    import argparse
+    
     parser = argparse.ArgumentParser(description="Dump a binary EVTX file into XML.")
     parser.add_argument("evtx",type=str,action="store",help="Path to the Windows EVTX event log file")
     parser.add_argument("-o","--output",type=str, action="store",help="Path of output JSON file")
