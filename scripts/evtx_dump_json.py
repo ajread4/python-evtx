@@ -4,7 +4,6 @@
 #
 #   Purpose: User can dump evtx data into JSON format to either the command line or a JSON file in new line delimited format/JSON array.
 #   Details: The JSON object is created with only the EventRecordID from the System section of the evtx XML and all of the information within the EventData section.
-
 #
 #   Requires:
 #     - xmltodict >= 0.12.0
@@ -15,7 +14,6 @@ import json
 import xmltodict
 
 import Evtx.Evtx as evtx
-import Evtx.Views as e_views
 
 
 def main():
@@ -83,10 +81,10 @@ def main():
         if args.output:
 
             # Output the JSON data
-            if (os.path.splitext(args.output)[1] == ".json"):
+            if os.path.splitext(args.output)[1] == ".json":
                 json_file = args.output
             else:
-                json_file = args.output +".json"
+                json_file = args.output + ".json"
 
             # Write to JSON file
             with open(json_file,"w") as outfile:
