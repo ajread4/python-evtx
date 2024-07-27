@@ -9,21 +9,16 @@
 #     - xmltodict >= 0.12.0
 import os
 import json
-
+import sys
 import xmltodict
 import argparse
 
 import Evtx.Evtx as evtx
 
 
-def main():
-    
-    parser = argparse.ArgumentParser(description="Dump a binary EVTX file into XML.")
-    parser.add_argument("evtx",type=str,action="store",help="Path to the Windows EVTX event log file")
-    parser.add_argument("-o","--output",type=str, action="store",help="Path of output JSON file")
-    args = parser.parse_args()
+def main(evtx_file,output):
 
-    with evtx.Evtx(args.evtx) as log:
+    with evtx.Evtx(evtx_file) as log:
 
         # Instantiate the final json object
         final_json = []
@@ -37,7 +32,6 @@ def main():
             # Create first line of System Data based on the EventRecordID
             json_subline = {}
             json_subline.update({'EventRecordID':data_dict['Event']['System']['EventRecordID']})
-
 
             # Loop through each key,value pair of the System section of the evtx logs
             for event_system_key, event_system_value in data_dict['Event']['System'].items():
@@ -57,7 +51,7 @@ def main():
                         json_subline.update({event_system_key: event_system_value})
 
             # Loop through each key, value pair of the EventData section of the evtx logs
-            if data_dict['Event']['EventData']!= None: 
+            if "EventData" in data_dict['Event'].keys() and data_dict['Event']['EventData'] != None: 
                 for event_data_key, event_data_value in data_dict['Event']['EventData'].items():
                     for values in event_data_value:
 
@@ -70,7 +64,12 @@ def main():
  
                                 # Add information to the JSON object for this specific log
                                 json_subline.update({data_name: data_value})
-                                
+
+            # Loop through each key, value pair in UserData section, if present
+            if "UserData" in data_dict["Event"].keys():
+                for user_data_key,user_data_value in data_dict['Event']['UserData'].items():
+                    json_subline.update({user_data_key: user_data_value})
+
             # Add specific log JSON object to the final JSON object
             if not final_json:
                 final_json = [json_subline]
@@ -78,7 +77,7 @@ def main():
                 final_json.append(json_subline)
 
         # If output is desired
-        if args.output:
+        if output:
 
             # Output the JSON data
             if os.path.splitext(args.output)[1] == ".json":
@@ -93,4 +92,10 @@ def main():
             print(json.dumps(final_json))
 
 if __name__ == "__main__":
-    main()
+
+    parser = argparse.ArgumentParser(description="Dump a binary EVTX file into JSON.")
+    parser.add_argument("evtx",type=str,action="store",help="Path to the Windows EVTX event log file")
+    parser.add_argument("-o","--output",type=str, action="store",help="Path of output JSON file")
+    args = parser.parse_args()
+
+    main(args.evtx,args.output)
