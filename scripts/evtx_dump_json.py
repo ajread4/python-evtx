@@ -75,7 +75,7 @@ def main(evtx_file,output):
                             if event_data_subkey == "@Name":
                                 data_name = event_data_subvalue
                             else: 
-                                data_value=event_data_subvalue
+                                data_value = event_data_subvalue
 
                                 # Add information to the JSON object for this specific log
                                 json_subline.update({data_name: data_value})
