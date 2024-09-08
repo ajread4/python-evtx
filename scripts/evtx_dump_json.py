@@ -48,22 +48,42 @@ def main(evtx_file,output):
                                 json_subline.update({event_system_subkey[1:]: event_system_subvalue})
 
                     else: 
+                        # Add information to the JSON object for this specific log
                         json_subline.update({event_system_key: event_system_value})
 
             # Loop through each key, value pair of the EventData section of the evtx logs
             if "EventData" in data_dict['Event'].keys() and data_dict['Event']['EventData'] != None: 
                 for event_data_key, event_data_value in data_dict['Event']['EventData'].items():
-                    for values in event_data_value:
 
-                        # Loop through each subvalue within the EvenData section to extract necessary information
-                        for event_data_subkey,event_data_subvalue in values.items():
+                    # Check to see if the EventData Data contains a list 
+                    if isinstance(event_data_value,list) and event_data_key!="@Name":
+                        for values in event_data_value:
+
+                            # Loop through each subvalue within the EvenData section to extract necessary information
+                            for event_data_subkey,event_data_subvalue in values.items():
+                                if event_data_subkey == "@Name":
+                                    data_name = event_data_subvalue
+                                else:
+                                    data_value = event_data_subvalue
+     
+                                    # Add information to the JSON object for this specific log
+                                    json_subline.update({data_name: data_value})
+
+                    # Check to see if EventData contains a dictionary 
+                    if isinstance(event_data_value,dict) and event_data_key!="@Name":
+                        for event_data_subkey,event_data_subvalue in event_data_value.items():
                             if event_data_subkey == "@Name":
                                 data_name = event_data_subvalue
-                            else:
+                            else: 
                                 data_value = event_data_subvalue
- 
+
                                 # Add information to the JSON object for this specific log
                                 json_subline.update({data_name: data_value})
+                     
+                    # Check to see if EventData contains a string 
+                    if isinstance(event_data_value,str) and event_data_key!="@Name":
+                        beautify_event_data_value=event_data_value.replace("<string>","").replace("\n"," ").replace("</string>","")
+                        json_subline.update({event_data_key: beautify_event_data_value})
 
             # Loop through each key, value pair in UserData section, if present
             if "UserData" in data_dict["Event"].keys():
